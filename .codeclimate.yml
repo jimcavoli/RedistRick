@@ -1,0 +1,17 @@
+engines:
+  duplication:
+    enabled: true
+    config:
+      languages:
+        python:
+          mass_threshold: 32
+  pep8:
+    enabled: true
+  radon: 
+    enabled: true
+    config: 
+      python_version: 2
+      threshold: "B"
+ratings:
+   paths:
+   - "**.py"
