@@ -6,17 +6,19 @@ import os
 
 from arcpy import env
 
+
 class Toolbox(object):
 
-
+    '''
+        Defines the information shown in the ArcToolbox.
+    '''
     def __init__(self):
         '''
             Define the toolbox (the name of the toolbox is the name of the
             .pyt file).
         '''
-        self.label = "Toolbox"
-        self.alias = ""
-
+        self.label = 'Toolbox'
+        self.alias = ''
         # List of tool classes associated with this toolbox
         self.tools = [RedistRick]
 
@@ -108,3 +110,5 @@ class RedistRick(object):
 
 
 class DescribeDistricts(object):
+    def __init__(self):
+        pass
