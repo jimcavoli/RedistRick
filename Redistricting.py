@@ -8,6 +8,7 @@ from arcpy import env
 
 class Toolbox(object):
 
+
     def __init__(self):
         '''
             Define the toolbox (the name of the toolbox is the name of the
@@ -23,14 +24,15 @@ class Toolbox(object):
 class RedistRick(object):
 
     '''
-        Boilerplate Python Toolbox Functions
-    ''''
+        Boilerplate Python Toolbox Functions.
+    '''
     def __init__(self):
         '''
             Define the tool (tool name is the name of the class).
         '''
         self.label = "Draw New Districts by Union"
-        self.description = "Uses a simple union and join to output a new feature class of reformed polygon features"
+        self.description = ("Uses a simple union and join to output a new "
+                            "feature class of reformed polygon features")
         self.canRunInBackground = False
 
     def getParameterInfo(self):
@@ -49,8 +51,8 @@ class RedistRick(object):
     def updateParameters(self, parameters):
         '''
             Modify the values and properties of parameters before internal
-            validation is performed.  This method is called whenever a parameter
-            has been changed.
+            validation is performed.  This method is called whenever a
+            parameter has been changed.
         '''
         return
 
@@ -77,14 +79,15 @@ class RedistRick(object):
         feature_class_list = []
 
         '''
-            Implement an advanced join function and return a list of the new concatenated polygons
+            Implement an advanced join function and return a list of the new
+            concatenated polygons.
         '''
         return feature_class
 
     '''
         Using an advanced algorithm concatenates adjacent polygon based on
-        an attribute. Taking the mean across the total area. Combine to build features that meat the mean.
-        Within a user defined standard error.
+        an attribute. Taking the mean across the total area. Combine to build
+        features that meat the mean, within a user defined standard error.
     '''
     def equalDistribution(self):
         pass
