@@ -22,7 +22,7 @@ from decimal import Decimal
 from __future__ import division
 __all__ = [u'StatisticsError', u'pstdev', u'pvariance', u'stdev', u'variance',
            u'median',  u'median_low', u'median_high', u'median_grouped',
-           u'mean', u'mode' ]
+           u'mean', u'mode']
 
 u"""
 Basic statistics module.
@@ -102,6 +102,7 @@ A single exception is defined: StatisticsError is a subclass of ValueError.
 """
 
 # === Exceptions ===
+
 
 class StatisticsError(ValueError):
     pass
@@ -260,6 +261,30 @@ def _counts(data):
             table = table[:i]
             break
     return table
+
+
+def _stdev_calc(data, mean, population=False):
+    u"""Return the square root of the a variance.
+
+    See ``variance`` for arguments and other details.
+    See ``pvariance`` for arguments and other details.
+
+    >>> _stdev_calc([1.5, 2.5, 2.5, 2.75, 3.25, 4.75])
+    1.0810874155219827
+    >>> _stdev_calc([1.5, 2.5, 2.5, 2.75, 3.25, 4.75], population=True)
+    0.986893273527251
+
+    """
+    var = None
+    if population:
+        var = pvariance(data, mu)
+    else:
+        var = variance(data, xbar)
+
+    try:
+        return var.sqrt()
+    except AttributeError:
+        return math.sqrt(var)
 
 
 # === Measures of central tendency (averages) ===
@@ -567,11 +592,7 @@ def stdev(data, xbar=None):
     1.0810874155219827
 
     """
-    var = variance(data, xbar)
-    try:
-        return var.sqrt()
-    except AttributeError:
-        return math.sqrt(var)
+    _stdev_calc(data, xbar)
 
 
 def pstdev(data, mu=None):
@@ -583,8 +604,4 @@ def pstdev(data, mu=None):
     0.986893273527251
 
     """
-    var = pvariance(data, mu)
-    try:
-        return var.sqrt()
-    except AttributeError:
-        return math.sqrt(var)
+    _stdev_calc(data, mu, population=True)
