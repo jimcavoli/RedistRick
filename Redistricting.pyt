@@ -92,10 +92,8 @@ class Add_Integer_Field_Tool(object):
 
         # -----------------------------------------------------------------
         # Frequently Used Variables
-        code_directory = 'E:\\redistricting_data\code'
         infc_dir = os.path.split(arcpy.Describe(infc).catalogPath)[0]
         infc_name = arcpy.Describe(infc).file
-        write_file_name = 'temp_output.txt'
         # -----------------------------------------------------------------
 
         # define the workspace using the path name of the input feature class
