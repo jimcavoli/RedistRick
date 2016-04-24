@@ -1,5 +1,6 @@
 import arcpy
 import pythonaddins
+import result_dialog
 
 
 class DistrictButon(object):
@@ -9,6 +10,8 @@ class DistrictButon(object):
         self.checked = False
 
     def onClick(self):
+        app = RedistrictingResults()
+        app.mainloop()
         # TODO definitley not this....
         pythonaddins.GPToolDialog(("c:/Users/n44635/Documents/"
                                    "ArcGIS/Redistricting.pyt"),

@@ -15,11 +15,11 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+from __future__ import division
 import collections
 import math
 from fractions import Fraction
 from decimal import Decimal
-from __future__ import division
 __all__ = [u'StatisticsError', u'pstdev', u'pvariance', u'stdev', u'variance',
            u'median',  u'median_low', u'median_high', u'median_grouped',
            u'mean', u'mode']
