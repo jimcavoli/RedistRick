@@ -7,9 +7,11 @@ engines:
           mass_threshold: 32
   pep8:
     enabled: true
-  radon: 
+  radon:
     enabled: true
-    config: 
+    exclude_fingerprints:
+      - ab02f412af9913d69cb88501009281c8
+    config:
       python_version: 2
       threshold: "B"
 ratings:
