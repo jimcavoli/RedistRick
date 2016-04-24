@@ -17,11 +17,11 @@ from arcpy import env
 # returns and integer representing the number of districts
 # assigned in a feature class with attribute Dist_ID.
 # Districts are numbered 1 to n
-def numDistricts(infc):
+def numDistricts(infc, field):
         field_values = []
-        rows = arcpy.SearchCursor(infc, fields="Dist_ID")
+        rows = arcpy.SearchCursor(infc, fields=field)
         for row in rows:
-            instance = row.getValue("Dist_ID")
+            instance = row.getValue(field)
             field_values.append(instance)
 
         value_set = set(field_values)
@@ -121,91 +121,8 @@ class Add_Integer_Field_Tool(object):
                 row[1] = field_value
                 cursor.updateRow(row)
 
-# Tool to Select Features by Attribute and create a new feature class from them
-
-class Split_Layer_Tool(object):
-    def __init__(self):
-        """Define the tool"""
-        self.label = "Split Layer"
-        self.description = "Creates new features based on an attribute value"
-        self.canRunInBackground = False
-
-    def getParameterInfo(self):
-        """Define parameter definitions"""
-        # Input Feature Class
-        param0 = arcpy.Parameter(
-            displayName="Input Feature Class",
-            name="in_feature",
-            datatype="DEFeatureClass",
-            parameterType="Required",
-            direction="Input")
-
-        # only accept Polygon Feature Class
-        param0.filter.list = ["Polygon"]
-
-        # Field Selection is Based off of
-        param1 = arcpy.Parameter(
-            displayName="Field Name",
-            name="field_name",
-            datatype="Field",
-            parameterType="Required",
-            direction="Input")
-        param1.parameterDependencies = [param0.name]
-        param1.filter.list = ["LONG", "SHORT"]
-
-        # Outpath
-        param2 = arcpy.Parameter(
-            displayName="Output Folder",
-            name="field_value",
-            datatype="GPFeatureLayer",
-            parameterType="Required",
-            direction="Output")
-
-        # list of parameters for tool
-        parameters = [param0, param1, param2]
-        return parameters
-
-    def isLicensed(self):
-        """Set whether tool is licensed to execute."""
-        return True
-
-    def execute(self, parameters, messages):
-
-        infc = parameters[0].valueAsText
-        field = parameters[1].valueAsText
-        infc_dir = arcpy.Describe(infc).catalogPath
-        infc_name = arcpy.Describe(infc).file
-
-        env.workspace = infc_dir
-        # Isolate the range of values in present_values list
-        field_values = []
-        rows = arcpy.SearchCursor(infc_dir, fields="Dist_ID")
-        for row in rows:
-            instance = row.getValue("Dist_ID")
-            field_values.append(instance)
-
-        value_set = set(field_values)
-        present_values = list(value_set)
-
-        # Make a Layer from the Feature Class
-        arcpy.management.MakeFeatureLayer(infc_name, 'lyr')
-
-        # Select based off attribute value and make a new feature class
-        # that is stored in Results folder.
-        for i in present_values:
-            arcpy.management.SelectLayerByAttribute('lyr',
-                                                    "NEW_SELECTION",
-                                                    '"Dist_ID" = ' + str(i))
-            arcpy.management.CopyFeatures("lyr", os.path.join(
-                                          os.path.split(infc_dir)[0],
-                                          "district_" + str(i)))
-
-        return True
-
-
 # This builds districts based off of an attribute, Dist_ID.
 # Returns a field class of joined District Polygons
-
 
 class Build_Districts_Tool(object):
     def __init__(self):
@@ -220,7 +137,7 @@ class Build_Districts_Tool(object):
         param0 = arcpy.Parameter(
             displayName="Input Feature Class",
             name="in_feature",
-            datatype="DEFeatureClass",
+            datatype="GPFeatureLayer",
             parameterType="Required",
             direction="Input")
 
@@ -258,12 +175,12 @@ class Build_Districts_Tool(object):
         outfc = parameters[2].valueAsText
         env.workspace = os.path.split(infc)[0]
 
-        n = numDistricts(infc)
+        n = numDistricts(infc, parameters[1].valueAsText)
 
         # Create Layer from id (default layer name is lyr)
         arcpy.management.MakeFeatureLayer(infc, "lyr")
         # Dissolve layer
-        arcpy.management.Dissolve(infc, outfc, "Dist_ID")
+        arcpy.management.Dissolve(infc, outfc, parameters[1].valueAsText)
         # add dissolveed layer to district_layers array
 
         # join all members of district_layers array
