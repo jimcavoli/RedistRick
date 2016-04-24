@@ -14,8 +14,8 @@ from arcpy import env
 
 
 # Custom Function 1: numDistricts(featureclass), returns integer
-# returns and integer representing the number of districts assigned in a feature class
-# with attribute Dist_ID
+# returns and integer representing the number of districts
+# assigned in a feature class with attribute Dist_ID.
 # Districts are numbered 1 to n
 def numDistricts(infc):
         field_values = []
@@ -38,7 +38,9 @@ class Toolbox(object):
         self.label = "Toolbox"
         self.alias = ""
         # List of tool classes associated with this toolbox
-        self.tools = [Add_Integer_Field_Tool, Split_Layer_Tool, Build_Districts_Tool]
+        self.tools = [Add_Integer_Field_Tool,
+                      Split_Layer_Tool,
+                      Build_Districts_Tool]
 
 
 class Add_Integer_Field_Tool(object):
@@ -103,7 +105,7 @@ class Add_Integer_Field_Tool(object):
         try:
             arcpy.management.AddField(infc_name, field_name, "LONG")
         except arcpy.ExecuteError:
-            print (arcpy.getMessages(2))
+            print arcpy.getMessages(2)
 
         # Populate the Field
         arcpy.management.CalculateField(infc_name, field_name, field_value)
@@ -116,7 +118,7 @@ class Split_Layer_Tool(object):
     def __init__(self):
         """Define the tool"""
         self.label = "Split Layer"
-        self.description = "Creates new Feature Classes based off of instances that share the same value of the input field"
+        self.description = "Creates new features based on an attribute value"
         self.canRunInBackground = False
 
     def getParameterInfo(self):
@@ -177,11 +179,14 @@ class Split_Layer_Tool(object):
         present_values = list(value_set)
 
         # Make a Layer from the Feature Class
-        arcpy.management.MakeFeatureLayer(infc_name,'lyr')
+        arcpy.management.MakeFeatureLayer(infc_name, 'lyr')
 
-        # Select based off attribute value and make a new feature class that is stored in Results folder.
+        # Select based off attribute value and make a new feature class
+        # that is stored in Results folder.
         for i in present_values:
-            arcpy.management.SelectLayerByAttribute('lyr', "NEW_SELECTION", '"Dist_ID" = ' + str(i) + '' )
+            arcpy.management.SelectLayerByAttribute('lyr',
+                                                    "NEW_SELECTION",
+                                                    '"Dist_ID" = ' + str(i))
             arcpy.management.CopyFeatures("lyr", os.path.join(
                                           os.path.split(infc_dir)[0],
                                           "district_" + str(i)))
@@ -189,14 +194,15 @@ class Split_Layer_Tool(object):
         return True
 
 
-# This builds districts based off of an attribute, Dist_ID. Returns a field class of joined District Polygons
+# This builds districts based off of an attribute, Dist_ID.
+# Returns a field class of joined District Polygons
 
 
 class Build_Districts_Tool(object):
     def __init__(self):
         """Define the tool"""
         self.label = "Build Districts"
-        self.description = "Create District Polygon Feature Class based off Dist_ID attribute"
+        self.description = "Create District Polygons from Dist_ID attribute"
         self.canRunInBackground = False
 
     def getParameterInfo(self):
@@ -252,4 +258,5 @@ class Build_Districts_Tool(object):
         # add dissolveed layer to district_layers array
 
         # join all members of district_layers array
-        # use copy feature management toool to create a new feature class that is held under outfc.
+        # use copy feature management toool to create a new feature class
+        # that is held under outfc.
