@@ -56,7 +56,7 @@ class Add_Integer_Field_Tool(object):
         param0 = arcpy.Parameter(
             displayName="Input Feature Class",
             name="in_feature",
-            datatype="DEFeatureClass",
+            datatype="GPFeatureLayer",
             parameterType="Required",
             direction="Input")
 
@@ -105,14 +105,23 @@ class Add_Integer_Field_Tool(object):
         try:
             arcpy.management.AddField(infc_name, field_name, "LONG")
         except arcpy.ExecuteError:
-            print arcpy.getMessages(2)
+            print arcpy.GetMessages(2)
 
         # Populate the Field
-        arcpy.management.CalculateField(infc_name, field_name, field_value)
+        mxd = arcpy.mapping.MapDocument("CURRENT")
+        layer = arcpy.mapping.ListLayers(mxd)[0]
+        desc = arcpy.Describe(layer)
+        fids = [int(s) for s in desc.fidSet.split(";")]
 
+        cursor = arcpy.da.UpdateCursor(infc_name, ["FID", field_name])
+        mxd = arcpy.mapping.MapDocument("CURRENT")
+
+        for row in cursor:
+            if int(row[0]) in fids:
+                row[1] = field_value
+                cursor.updateRow(row)
 
 # Tool to Select Features by Attribute and create a new feature class from them
-
 
 class Split_Layer_Tool(object):
     def __init__(self):
