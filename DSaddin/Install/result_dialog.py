@@ -1,3 +1,6 @@
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import _tkinter
 import Tkinter as tk
 import tkMessageBox
@@ -7,7 +10,7 @@ from arcpy import env
 
 
 class RedistrictingResults(tk.Frame):
-    def __init__(self, district_layer, master=None):
+    def __init__(self, master=None):
         tk.Frame.__init__(self, master)
         self.master.title('Redistricting Results')
         self.grid()
@@ -15,7 +18,7 @@ class RedistrictingResults(tk.Frame):
         if tkMessageBox.askquestion("Redistricting Plan",
                                     "Continue defining districts?") is False:
             self.quit
-        self.createWidgets(district_layer)
+        self.createWidgets(sys.argv[1])
 
     def configureGrid(self):
         top = self.winfo_toplevel()
@@ -32,7 +35,7 @@ class RedistrictingResults(tk.Frame):
         self.rowconfigure(1, weight=1)
         self.rowconfigure(2, weight=1)
 
-    def createWidgets(self, district_layer):
+    def createWidgets(self, dist_fc):
         self.diretions = tk.Label(self, justify=tk.LEFT,
                                   text=(
                                     "The results of the redistricting plan "
@@ -45,11 +48,12 @@ class RedistrictingResults(tk.Frame):
                                     "below in the select boxes."
                                   ))
         self.diretions.grid(columnspan=3, sticky=tk.E+tk.W)
-        self.buildFieldSelect(district_layer)
+        self.buildFieldSelect(dist_fc)
         self.createActionButtons()
 
     def createActionButtons(self):
         self.actionsFrame = tk.Frame(self)
+        self.actionsFrame.grid(columnspan=3)
 
         self.reportButton = tk.Button(self.actionsFrame, text='Report',
                                       command=self.report, justify=tk.RIGHT)
@@ -62,12 +66,12 @@ class RedistrictingResults(tk.Frame):
         self.exportButton.grid(column=1, row=0, sticky=tk.E+tk.W)
         self.quitButton.grid(column=2, row=0, sticky=tk.E+tk.W)
 
-    def buildFieldSelect(self, district_layer):
+    def buildFieldSelect(self, dist_fc):
         self.fieldLabel = tk.Label(self, justify=tk.RIGHT,
                                    text='Field to Summarize:')
         self.fieldLabel.grid(column=1, row=1, sticky=tk.E)
 
-        fieldList = arcpy.ListFields(district_layer)
+        fieldList = ['Some', 'Items'] # arcpy.ListFields(dist_fc)
         self.selectedField = tk.StringVar()
         self.selectedField.set(None)
 
@@ -85,3 +89,8 @@ class RedistrictingResults(tk.Frame):
 
     def report(self):
         tkMessageBox.showinfo("You changed stuff.", 'You clicked Report.')
+
+
+if __name__ == "__main__":
+    app = RedistrictingResults()
+    app.mainloop()

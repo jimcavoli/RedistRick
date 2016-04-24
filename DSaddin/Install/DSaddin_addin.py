@@ -1,7 +1,7 @@
+import os
+import sys
 import arcpy
 import pythonaddins
-import result_dialog
-
 
 class DistrictButon(object):
     """Implementation for DSaddin_district.button (Button)"""
@@ -10,7 +10,8 @@ class DistrictButon(object):
         self.checked = False
 
     def onClick(self):
-        app = RedistrictingResults()
-        app.mainloop()
-        pythonaddins.GPToolDialog("Redistricting.pyt",
+        os.system("result_dialog.py None")
+        pythonaddins.GPToolDialog(os.path.join(
+                                  os.path.dirname(os.path.abspath(__file__)),
+                                  "Redistricting.pyt"),
                                   "Add_Integer_Field_tool")
