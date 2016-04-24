@@ -12,7 +12,5 @@ class DistrictButon(object):
     def onClick(self):
         app = RedistrictingResults()
         app.mainloop()
-        # TODO definitley not this....
-        # pythonaddins.GPToolDialog(("c:/Users/n44635/Documents/"
-        #                            "ArcGIS/Redistricting.pyt"),
-        #                           "Add_Integer_Field_tool")
+        pythonaddins.GPToolDialog("Redistricting.pyt",
+                                  "Add_Integer_Field_tool")

@@ -5,6 +5,7 @@ import arcpy
 import district_stats
 from arcpy import env
 
+
 class RedistrictingResults(tk.Frame):
     def __init__(self, district_layer, master=None):
         tk.Frame.__init__(self, master)
@@ -12,7 +13,7 @@ class RedistrictingResults(tk.Frame):
         self.grid()
         self.configureGrid()
         if tkMessageBox.askquestion("Redistricting Plan",
-                                    "Continue defining districts?") == False:
+                                    "Continue defining districts?") is False:
             self.quit
         self.createWidgets(district_layer)
 
@@ -51,11 +52,11 @@ class RedistrictingResults(tk.Frame):
         self.actionsFrame = tk.Frame(self)
 
         self.reportButton = tk.Button(self.actionsFrame, text='Report',
-            command=self.report, justify=tk.RIGHT)
+                                      command=self.report, justify=tk.RIGHT)
         self.exportButton = tk.Button(self.actionsFrame, text='Export',
-            command=self.export, justify=tk.RIGHT)
+                                      command=self.export, justify=tk.RIGHT)
         self.quitButton = tk.Button(self.actionsFrame, text='Finish',
-            command=self.quit, justify=tk.RIGHT)
+                                    command=self.quit, justify=tk.RIGHT)
 
         self.reportButton.grid(column=0, row=0, sticky=tk.E+tk.W)
         self.exportButton.grid(column=1, row=0, sticky=tk.E+tk.W)
@@ -70,8 +71,10 @@ class RedistrictingResults(tk.Frame):
         self.selectedField = tk.StringVar()
         self.selectedField.set(None)
 
-        self.fieldSelector = tk.OptionMenu(self, self.selectedField,
-                                           *fieldList, command=self.fieldChange)
+        self.fieldSelector = tk.OptionMenu(self,
+                                           self.selectedField,
+                                           *fieldList,
+                                           command=self.fieldChange)
         self.fieldSelector.grid(column=2, row=1, sticky=tk.E+tk.W)
 
     def fieldChange(self, value):
