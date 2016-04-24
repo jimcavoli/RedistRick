@@ -1,20 +1,28 @@
 # -*- coding: UTF-8 -*-
-##  Module statistics.py
-##
-##  Copyright (c) 2013 Steven D'Aprano <steve+python@pearwood.info>.
-##
-##  Licensed under the Apache License, Version 2.0 (the "License");
-##  you may not use this file except in compliance with the License.
-##  You may obtain a copy of the License at
-##
-##  http://www.apache.org/licenses/LICENSE-2.0
-##
-##  Unless required by applicable law or agreed to in writing, software
-##  distributed under the License is distributed on an "AS IS" BASIS,
-##  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-##  See the License for the specific language governing permissions and
-##  limitations under the License.
+#  Module statistics.py
+#
+#  Copyright (c) 2013 Steven D'Aprano <steve+python@pearwood.info>.
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
 
+import collections
+import math
+from fractions import Fraction
+from decimal import Decimal
+from __future__ import division
+__all__ = [u'StatisticsError', u'pstdev', u'pvariance', u'stdev', u'variance',
+           u'median',  u'median_low', u'median_high', u'median_grouped',
+           u'mean', u'mode' ]
 
 u"""
 Basic statistics module.
@@ -92,21 +100,6 @@ Exceptions
 A single exception is defined: StatisticsError is a subclass of ValueError.
 
 """
-
-from __future__ import division
-__all__ = [ u'StatisticsError',
-            u'pstdev', u'pvariance', u'stdev', u'variance',
-            u'median',  u'median_low', u'median_high', u'median_grouped',
-            u'mean', u'mode',
-          ]
-
-
-import collections
-import math
-
-from fractions import Fraction
-from decimal import Decimal
-
 
 # === Exceptions ===
 
@@ -313,7 +306,7 @@ def median(data):
     n = len(data)
     if n == 0:
         raise StatisticsError(u"no median for empty data")
-    if n%2 == 1:
+    if n % 2 == 1:
         return data[n//2]
     else:
         i = n//2
@@ -336,7 +329,7 @@ def median_low(data):
     n = len(data)
     if n == 0:
         raise StatisticsError(u"no median for empty data")
-    if n%2 == 1:
+    if n % 2 == 1:
         return data[n//2]
     else:
         return data[n//2 - 1]
