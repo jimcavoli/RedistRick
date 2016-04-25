@@ -592,7 +592,7 @@ def stdev(data, xbar=None):
     1.0810874155219827
 
     """
-    _stdev_calc(data, xbar)
+    return _stdev_calc(data, xbar)
 
 
 def pstdev(data, mu=None):
@@ -604,4 +604,4 @@ def pstdev(data, mu=None):
     0.986893273527251
 
     """
-    _stdev_calc(data, mu, population=True)
+    return _stdev_calc(data, mu, population=True)
