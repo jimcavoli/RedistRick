@@ -57,7 +57,7 @@ class Add_Integer_Field_Tool(object):
         param0 = arcpy.Parameter(
             displayName="Input Feature Class",
             name="in_feature",
-            datatype="GPFeatureLayer",
+            datatype= ["GPFeatureLayer", "GPString"],
             parameterType="Required",
             direction="Input")
 
@@ -127,14 +127,29 @@ class Add_Integer_Field_Tool(object):
             except arcpy.ExecuteError:
                 print arcpy.GetMessages(2)
 
-        # Not certain why we need to use the mxd file so I'm gonna try
-        # to edit without.
+        # Populate the Field
+        mxd = arcpy.mapping.MapDocument("CURRENT")
+        layers = arcpy.mapping.ListLayers(mxd)
+        selected_lyr = []
+        for layer in layers:
+            fids = arcpy.Describe(layer).FIDSet
+            if len(fids) > 0:
+                selected_lyr.append(layer)
+
+        # Only deal with the first selected layer in array if user has made
+        # Selections across multiple layers
+
+        # TODO: Error message for selecting from multiple .lyr files.
+
+        desc = arcpy.Describe(selected_lyr[0])
+        fids = [int(s) for s in (desc.FIDSet.split("; "))]
 
         rows = arcpy.UpdateCursor(infc_name)
 
         for row in rows:
-            row.setValue(field_name, field_value)
-            rows.updateRow(row)
+            if int(row.getValue("FID")) in fids:
+                row.setValue(field_name, field_value)
+                rows.updateRow(row)
 
         # Prevent locks on the layer
         del row
