@@ -43,38 +43,55 @@ class Toolbox(object):
                       Build_Districts_Tool]
 
 
+
 class Add_Integer_Field_Tool(object):
     def __init__(self):
         """Define the tool (tool name is the name of the class)."""
-        self.label = "Add Integer Field"
-        self.description = "Populate a new Field with a uniform integer value"
+        self.label = "Update District ID"
+        self.description = "Enter integer value for the district that will be assigned to selected features"
         self.canRunInBackground = False
 
     def getParameterInfo(self):
         """Define parameter definitions"""
-        # input TIGER file layer (shp file)
+        # Census Tract Layer (Or other polygon layer with population data that needs to be aggregated)
         param0 = arcpy.Parameter(
             displayName="Input Feature Class",
             name="in_feature",
             datatype="GPFeatureLayer",
             parameterType="Required",
             direction="Input")
+        
+        # Read the directory of infc from temp.txt file
+        f = open(r'E:\redistricting_data\RedistRick-development\DSaddin\Install\temp.txt','r')
+        param0.value = f.readline()                         # Not sure if '\n' appended will cause a problem
+        
+      
 
         # Name of Field to be Added
+        # Ideally the datatype would be 'Field' and the parameter would be dependent to 
+        #   param0. If param0 does not have the appropriate attribute then the tool will add one automatically
         param1 = arcpy.Parameter(
-            displayName="New Field",
-            name="new_field",
-            datatype="GPString",
-            parameterType="Required",
+            displayName="District ID Field",
+            name="district_field",
+            datatype="Field",
+            parameterType="Optional",                       # if not provided then execute block add "Dist_ID" Field of type Long
             direction="Input")
-
-        # Value to populate the field
+        
+        param1.parameterDependencies = [param0.name]
+        param1.filter.list = ["FID","LONG","DOUBLE"]
+        param1.value = 'N/A'                               # Default to Identify no existing field, If user does not change then create new field
+        
+        # District Number
         param2 = arcpy.Parameter(
             displayName="Field Integer Value",
             name="field_value",
             datatype="GPLong",
             parameterType="Required",
             direction="Input")
+            
+        # allow only normal numbers 
+        param2.filter.type = "Range"
+        param2.filter.list = [1,100]                        # Hard coded upper bound, but should be derived from the number of polygons in param0.
 
         # list of parameters for tool
         parameters = [param0, param1, param2]
@@ -99,26 +116,30 @@ class Add_Integer_Field_Tool(object):
         # define the workspace using the path name of the input feature class
         env.workspace = infc_dir
 
+        # Add field if the parameter was left blank
         # Add Field to the Feature Class
-        try:
-            arcpy.management.AddField(infc_name, field_name, "LONG")
-        except arcpy.ExecuteError:
-            print arcpy.GetMessages(2)
+        
+        if field_name == 'N/A':
+            try:
+                field_name = 'Dist_ID'
+                arcpy.management.AddField(infc_name, field_name, "LONG")
+            except arcpy.ExecuteError:
+                print arcpy.GetMessages(2)
 
-        # Populate the Field
-        mxd = arcpy.mapping.MapDocument("CURRENT")
-        layer = arcpy.mapping.ListLayers(mxd)[0]
-        desc = arcpy.Describe(layer)
-        fids = [int(s) for s in desc.fidSet.split(";")]
+        # Not certain why we need to use the mxd file so I'm gonna try 
+        # to edit without. 
+             
+          
+        rows = arcpy.UpdateCursor(infc_name)
 
-        cursor = arcpy.da.UpdateCursor(infc_name, ["FID", field_name])
-        mxd = arcpy.mapping.MapDocument("CURRENT")
 
-        for row in cursor:
-            if int(row[0]) in fids:
-                row[1] = field_value
-                cursor.updateRow(row)
-
+        for row in rows:
+            row.setValue(field_name, field_value)
+            rows.updateRow(row)
+        
+        # Prevent locks on the layer
+        del row
+        del rows
 # Tool to Select Features by Attribute and create a new feature class from them
 
 class Split_Layer_Tool(object):
