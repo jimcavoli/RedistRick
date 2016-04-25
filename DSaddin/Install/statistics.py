@@ -277,9 +277,9 @@ def _stdev_calc(data, mean, population=False):
     """
     var = None
     if population:
-        var = pvariance(data, mu)
+        var = pvariance(data, mean)
     else:
-        var = variance(data, xbar)
+        var = variance(data, mean)
 
     try:
         return var.sqrt()

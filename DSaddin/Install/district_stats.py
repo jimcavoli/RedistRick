@@ -14,9 +14,9 @@ class DistrictStats:
         return Summary(self.shapefile, field)
 
     def csv(self, fields, outfile):
-        with open(outfile, 'wb') as output:
-            wr = csv.writer(output, delimiter=' ',
-                            quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        with open(outfile, 'w') as output:
+            wr = csv.writer(output, quoting=csv.QUOTE_MINIMAL)
+            wr.writerow(['Field', 'Mean', 'Median', 'St Dev'])
             for field in fields:
                 s = self.summary(field)
                 wr.writerow([field, s.mean(), s.median(), s.stdev()])
@@ -29,7 +29,16 @@ class Summary:
         self.values = []
         cursor = arcpy.SearchCursor(shapefile)
         for row in cursor:
-            self.values.append(float(row.getValue(field)))
+            try:
+                if field == "Shape":
+                    self.values.append(0.0)
+                else:
+                    value = str(row.getValue(field))
+                    if value is None:
+                        value = "0"
+                    self.values.append(float(value))
+            except ValueError:
+                self.values.append(0.0)
 
     def mean(self):
         return statistics.mean(self.values)
