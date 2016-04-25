@@ -4,9 +4,11 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import _tkinter
 import Tkinter as tk
 import tkMessageBox
+import tkFileDialog
 import arcpy
-import district_stats
+from district_stats import DistrictStats
 from arcpy import env
+import pythonaddins
 
 
 class RedistrictingResults(tk.Frame):
@@ -15,10 +17,11 @@ class RedistrictingResults(tk.Frame):
         self.master.title('Redistricting Results')
         self.grid()
         self.configureGrid()
-        if tkMessageBox.askquestion("Redistricting Plan",
-                                    "Continue defining districts?") is False:
-            self.quit
-        self.createWidgets(sys.argv[1])
+        # if tkMessageBox.askquestion("Redistricting Plan",
+        #                             "Continue defining districts?") is False:
+        #     self.quit()
+        self.district_fc = sys.argv[1]
+        self.createWidgets()
 
     def configureGrid(self):
         top = self.winfo_toplevel()
@@ -35,7 +38,7 @@ class RedistrictingResults(tk.Frame):
         self.rowconfigure(1, weight=1)
         self.rowconfigure(2, weight=1)
 
-    def createWidgets(self, dist_fc):
+    def createWidgets(self):
         self.diretions = tk.Label(self, justify=tk.LEFT,
                                   text=(
                                     "The results of the redistricting plan "
@@ -48,7 +51,7 @@ class RedistrictingResults(tk.Frame):
                                     "below in the select boxes."
                                   ))
         self.diretions.grid(columnspan=3, sticky=tk.E+tk.W)
-        self.buildFieldSelect(dist_fc)
+        self.buildFieldSelect()
         self.createActionButtons()
 
     def createActionButtons(self):
@@ -66,12 +69,14 @@ class RedistrictingResults(tk.Frame):
         self.exportButton.grid(column=1, row=0, sticky=tk.E+tk.W)
         self.quitButton.grid(column=2, row=0, sticky=tk.E+tk.W)
 
-    def buildFieldSelect(self, dist_fc):
+    def buildFieldSelect(self):
         self.fieldLabel = tk.Label(self, justify=tk.RIGHT,
                                    text='Field to Summarize:')
         self.fieldLabel.grid(column=1, row=1, sticky=tk.E)
 
-        fieldList = ['Some', 'Items'] # arcpy.ListFields(dist_fc)
+        # TODO read from district_fc instead
+        fieldList = ['Several','Strings','Here']
+        # fieldList = arcpy.ListFields(self.district_fc)
         self.selectedField = tk.StringVar()
         self.selectedField.set(None)
 
@@ -85,11 +90,16 @@ class RedistrictingResults(tk.Frame):
         tkMessageBox.showinfo("You changed stuff.", "Now you say " + value)
 
     def export(self):
-        tkMessageBox.showinfo("You changed stuff.", 'You clicked Export.')
+        pythonaddins.GPToolDialog(os.path.join(
+                                  os.path.dirname(os.path.abspath(__file__)),
+                                  "Redistricting.pyt"),
+                                  "Build_Districts_Tool")
 
     def report(self):
+        output_file = tkFileDialog.asksaveasfilename()
+        stats = DistrictStats(self.district_fc)
+        stats.csv(self.selectedField, output_file)
         tkMessageBox.showinfo("You changed stuff.", 'You clicked Report.')
-
 
 if __name__ == "__main__":
     app = RedistrictingResults()
